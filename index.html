@@ -239,8 +239,13 @@
                         questionContainer.style.top = 'auto';
                         questionContainer.style.bottom = 'auto';
 
-                        // 모든 질문을 밑줄 위에 배치
-                        questionContainer.style.bottom = `calc(100% + ${gap}px)`;
+                        if (lines <= 1) {
+                            // 1줄: 밑줄 바로 위 (릴 디스플레이와 같은 위치)
+                            questionContainer.style.bottom = `calc(100% + ${gap}px)`;
+                        } else {
+                            // 2줄 이상: 한 줄 더 올림
+                            questionContainer.style.bottom = `calc(100% + ${gap + lineHeight}px)`;
+                        }
 
                         questionContainer.classList.add('show');
                         isSpinning = false;
