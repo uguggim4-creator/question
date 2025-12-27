@@ -218,6 +218,7 @@
             const deceleration = 0.95;
             let targetPosition = (displayQuestions.length - 1) * 200;
             let isAccelerating = true;
+            let isDecelerating = false;
 
             function animate() {
                 if (isAccelerating && speed < maxSpeed) {
@@ -231,13 +232,15 @@
                 position += speed;
 
                 if (position >= targetPosition - 2000) {
+                    if (!isDecelerating) {
+                        isDecelerating = true;
+                    }
                     speed *= deceleration;
                 }
 
                 slotReel.style.transform = `translateY(-${position}px)`;
-                slotReel.style.transition = 'none';
 
-                if (position < targetPosition) {
+                if (position < targetPosition && speed > 0.5) {
                     requestAnimationFrame(animate);
                 } else {
                     // 정확한 위치에 맞추기
