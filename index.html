@@ -239,13 +239,8 @@
                         questionContainer.style.top = 'auto';
                         questionContainer.style.bottom = 'auto';
 
-                        if (lines <= 1) {
-                            // 1줄: 밑줄 바로 위
-                            questionContainer.style.bottom = `calc(100% + ${gap}px)`;
-                        } else {
-                            // 2줄 이상: 아래줄이 밑줄에 닿도록 아래에 배치
-                            questionContainer.style.top = `calc(100% + ${gap}px)`;
-                        }
+                        // 모든 질문을 밑줄 위에 배치
+                        questionContainer.style.bottom = `calc(100% + ${gap}px)`;
 
                         questionContainer.classList.add('show');
                         isSpinning = false;
