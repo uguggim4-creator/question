@@ -69,16 +69,15 @@
         .question-container {
             width: 100%;
             text-align: center;
-            min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
             opacity: 0;
             transition: opacity 0.8s ease;
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            margin-top: 0;
+            left: 0;
+            top: auto;
+            bottom: auto;
         }
 
         .question-container.show {
@@ -230,18 +229,24 @@
                     
                     // 페이드인 전에 위치 조정
                     setTimeout(() => {
-                        const questionHeight = questionContainer.offsetHeight;
-                        const reelHeight = reelDisplay.offsetHeight;
-                        
-                        // 줄 수에 따라 위치 조정
-                        // 1줄: 밑줄 바로 위 / 2줄: 아래줄이 밑줄에 닿게
-                        if (questionHeight < 60) {
-                            // 1줄: 위로 배치
-                            questionContainer.style.top = `calc(-100% - ${reelHeight + 10}px)`;
+                        const textStyle = window.getComputedStyle(questionText);
+                        const lineHeight = parseFloat(textStyle.lineHeight) || 24;
+                        const textHeight = questionText.scrollHeight;
+                        const lines = Math.round(textHeight / lineHeight);
+                        const gap = 12;
+
+                        // 위치 초기화 후 줄 수에 따라 배치
+                        questionContainer.style.top = 'auto';
+                        questionContainer.style.bottom = 'auto';
+
+                        if (lines <= 1) {
+                            // 1줄: 밑줄 바로 위
+                            questionContainer.style.bottom = `calc(100% + ${gap}px)`;
                         } else {
-                            // 2줄: 아래줄이 밑줄에 오게
-                            questionContainer.style.top = `calc(100% + ${reelHeight + 10}px)`;
+                            // 2줄 이상: 아래줄이 밑줄에 닿도록 아래에 배치
+                            questionContainer.style.top = `calc(100% + ${gap}px)`;
                         }
+
                         questionContainer.classList.add('show');
                         isSpinning = false;
                         spinButton.disabled = false;
