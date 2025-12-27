@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #0a3d2e 0%, #1a5c47 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -110,6 +110,30 @@
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
+        .reset-button {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.3);
+        }
+
+        .reset-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(31, 38, 135, 0.4);
+        }
+
+        .reset-button:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
@@ -121,6 +145,7 @@
         </div>
         <button class="spin-button" id="spinButton">질문 뽑기</button>
         <div class="counter" id="counter">남은 질문: 100개</div>
+        <button class="reset-button" id="resetButton">다시하기</button>
     </div>
 
     <script>
@@ -269,23 +294,30 @@
             createSlotItems(displayQuestions);
 
             let position = 0;
-            let speed = 20;
-            const maxSpeed = 100;
-            const deceleration = 0.97;
+            let speed = 5;
+            const maxSpeed = 50;
+            const acceleration = 1.15;
+            const deceleration = 0.95;
             let targetPosition = (displayQuestions.length - 1) * 200;
+            let isAccelerating = true;
 
             function animate() {
-                if (speed < maxSpeed) {
-                    speed += 5;
+                if (isAccelerating && speed < maxSpeed) {
+                    speed *= acceleration;
+                    if (speed >= maxSpeed) {
+                        speed = maxSpeed;
+                        isAccelerating = false;
+                    }
                 }
 
                 position += speed;
 
-                if (position >= targetPosition - 1000) {
+                if (position >= targetPosition - 2000) {
                     speed *= deceleration;
                 }
 
                 slotReel.style.transform = `translateY(-${position}px)`;
+                slotReel.style.transition = 'none';
 
                 if (position < targetPosition) {
                     requestAnimationFrame(animate);
@@ -313,6 +345,17 @@
         }
 
         spinButton.addEventListener('click', spin);
+
+        const resetButton = document.getElementById('resetButton');
+        resetButton.addEventListener('click', () => {
+            availableQuestions = [...questions];
+            usedQuestions = [];
+            spinButton.disabled = false;
+            spinButton.textContent = '질문 뽑기';
+            createSlotItems([questions[0]]);
+            slotReel.style.transform = 'translateY(0)';
+            updateCounter();
+        });
 
         // 초기 표시
         createSlotItems([questions[0]]);
