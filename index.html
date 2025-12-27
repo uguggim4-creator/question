@@ -103,11 +103,20 @@
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .spin-button:hover:not(:disabled) {
             background: rgba(255, 255, 255, 0.25);
             transform: translateY(-2px);
+        }
+
+        .spin-button:active:not(:disabled) {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(0);
         }
 
         .spin-button:disabled {
