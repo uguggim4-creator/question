@@ -76,7 +76,8 @@
             opacity: 0;
             transition: opacity 0.8s ease;
             position: absolute;
-            top: calc(-100% - 20px);
+            top: 50%;
+            transform: translateY(-50%);
             margin-top: 0;
         }
 
@@ -227,8 +228,20 @@
                     questionText.textContent = QUESTIONS[selectedIndex];
                     questionContainer.classList.remove('show');
                     
-                    // 페이드인
+                    // 페이드인 전에 위치 조정
                     setTimeout(() => {
+                        const questionHeight = questionContainer.offsetHeight;
+                        const reelHeight = reelDisplay.offsetHeight;
+                        
+                        // 줄 수에 따라 위치 조정
+                        // 1줄: 밑줄 바로 위 / 2줄: 아래줄이 밑줄에 닿게
+                        if (questionHeight < 60) {
+                            // 1줄: 위로 배치
+                            questionContainer.style.top = `calc(-100% - ${reelHeight + 10}px)`;
+                        } else {
+                            // 2줄: 아래줄이 밑줄에 오게
+                            questionContainer.style.top = `calc(100% + ${reelHeight + 10}px)`;
+                        }
                         questionContainer.classList.add('show');
                         isSpinning = false;
                         spinButton.disabled = false;
