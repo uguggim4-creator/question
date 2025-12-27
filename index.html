@@ -232,11 +232,11 @@
                 }
 
                 position += speed;
-                slotReel.style.transform = `translateY(-${position}px)`;
+                slotReel.style.transform = `translateY(${position}px)`;
 
                 // 종료 조건
                 if (position >= targetPosition - 100 && speed < 1) {
-                    slotReel.style.transform = `translateY(-${targetPosition}px)`;
+                    slotReel.style.transform = `translateY(${targetPosition}px)`;
                     
                     // 사용된 질문 처리
                     setTimeout(() => {
