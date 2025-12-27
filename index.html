@@ -13,85 +13,101 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #000000;
+            background: url('./images/10.jpg') center/cover fixed;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
         }
 
         .container {
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
-        }
-
-        .slot-machine {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 40px;
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            width: 100%;
-        }
-
-        .slot-window {
-            height: 200px;
-            overflow: hidden;
+            gap: 40px;
             position: relative;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .slot-reel {
-            position: absolute;
-            width: 100%;
-            transition: transform 0.1s linear;
-        }
-
-        .slot-item {
-            height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            z-index: 1;
             padding: 20px;
-            font-size: 20px;
-            font-weight: 500;
-            color: white;
+        }
+
+        .reel-display {
+            width: 100%;
             text-align: center;
-            line-height: 1.5;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            padding: 20px 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.8);
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .reel-display.hide {
+            color: transparent;
+        }
+
+        .question-container {
+            width: 100%;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            position: absolute;
+            top: calc(-100% - 20px);
+            margin-top: 0;
+        }
+
+        .question-container.show {
+            opacity: 1;
+        }
+
+        .question-text {
+            font-size: 24px;
+            font-weight: 600;
+            color: white;
+            line-height: 1.6;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            padding: 20px;
         }
 
         .spin-button {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
+            padding: 15px 50px;
             font-size: 18px;
             font-weight: 600;
-            padding: 15px 50px;
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.3);
         }
 
         .spin-button:hover:not(:disabled) {
             background: rgba(255, 255, 255, 0.25);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px 0 rgba(31, 38, 135, 0.4);
-        }
-
-        .spin-button:active:not(:disabled) {
-            transform: translateY(0);
         }
 
         .spin-button:disabled {
@@ -100,56 +116,30 @@
         }
 
         .counter {
-            color: white;
             font-size: 16px;
             font-weight: 500;
-            text-align: center;
+            color: white;
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
             padding: 10px 20px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .reset-button {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            font-size: 16px;
-            font-weight: 600;
-            padding: 12px 40px;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.3);
-        }
-
-        .reset-button:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px 0 rgba(31, 38, 135, 0.4);
-        }
-
-        .reset-button:active {
-            transform: translateY(0);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="slot-machine">
-            <div class="slot-window">
-                <div class="slot-reel" id="slotReel"></div>
+        <div style="position: relative; width: 100%;">
+            <div class="reel-display" id="reelDisplay">질문 뽑는중</div>
+            <div class="question-container" id="questionContainer">
+                <div class="question-text" id="questionText"></div>
             </div>
         </div>
         <button class="spin-button" id="spinButton">질문 뽑기</button>
-        <div class="counter" id="counter">남은 질문: 20개</div>
-        <button class="reset-button" id="resetButton">다시하기</button>
+        <div class="counter" id="counter">남은 질문: 20</div>
     </div>
 
     <script>
-        const questions = [
+        const QUESTIONS = [
             "오늘이 영화라면, 그 영화는 무슨 장르?",
             "어느날 갑자기 동물로 변한다면 무슨 동물?",
             "최근 빠져 있는 취미나 관심사?",
@@ -172,108 +162,86 @@
             "올해 나를 가장 바쁘게 했던 것.",
         ];
 
-        let availableQuestions = [...questions];
-        let usedQuestions = [];
-        let isSpinning = false;
+        const REEL_ITEMS = [
+            '질문 뽑는중',
+            '두구두구두',
+            '따라란',
+            '쿵짝짝',
+            '빠빠밤',
+        ];
 
-        const slotReel = document.getElementById('slotReel');
+        let selectedIndices = new Set();
+        let isSpinning = false;
+        let spinInterval = null;
+
         const spinButton = document.getElementById('spinButton');
+        const reelDisplay = document.getElementById('reelDisplay');
+        const questionContainer = document.getElementById('questionContainer');
+        const questionText = document.getElementById('questionText');
         const counter = document.getElementById('counter');
 
         function updateCounter() {
-            counter.textContent = `남은 질문: ${availableQuestions.length}개`;
-        }
-
-        function createSlotItems(questionsArray) {
-            slotReel.innerHTML = '';
-            questionsArray.forEach(question => {
-                const item = document.createElement('div');
-                item.className = 'slot-item';
-                item.textContent = question;
-                slotReel.appendChild(item);
-            });
+            const remaining = QUESTIONS.length - selectedIndices.size;
+            counter.textContent = `남은 질문: ${remaining}`;
         }
 
         function spin() {
-            if (isSpinning || availableQuestions.length === 0) return;
-
+            if (isSpinning) return;
+            
             isSpinning = true;
             spinButton.disabled = true;
-
-            // 선택될 질문을 미리 정하기
-            const selectedIndex = Math.floor(Math.random() * availableQuestions.length);
-            const selectedQuestion = availableQuestions[selectedIndex];
             
-            // 회전할 질문들 준비 (20개 이상으로 많이 반복)
-            const rotationQuestions = [];
-            for (let i = 0; i < 25; i++) {
-                const idx = Math.floor(Math.random() * availableQuestions.length);
-                rotationQuestions.push(availableQuestions[idx]);
+            // 이전 질문 숨기기
+            questionContainer.classList.remove('show');
+            
+            // 릴 표시
+            reelDisplay.classList.remove('hide');
+
+            // 모든 질문이 선택되었으면 초기화
+            if (selectedIndices.size === QUESTIONS.length) {
+                selectedIndices.clear();
             }
-            rotationQuestions.push(selectedQuestion);
-            
-            createSlotItems(rotationQuestions);
 
-            let position = 0;
-            let speed = 15;
-            const maxSpeed = 80;
-            const targetPosition = (rotationQuestions.length - 1) * 200;
-            let animationId = null;
+            // 아직 선택되지 않은 질문 중에서 무작위 선택
+            let selectedIndex;
+            do {
+                selectedIndex = Math.floor(Math.random() * QUESTIONS.length);
+            } while (selectedIndices.has(selectedIndex));
 
-            function animate() {
-                // 가속 단계
-                if (speed < maxSpeed) {
-                    speed += 3;
-                }
-                
-                // 감속 시작 지점
-                if (position > targetPosition - 3000) {
-                    speed *= 0.96;
-                }
+            selectedIndices.add(selectedIndex);
 
-                position += speed;
-                slotReel.style.transform = `translateY(${position}px)`;
+            // 릴 아이템들을 순환
+            let itemIndex = 0;
+            spinInterval = setInterval(() => {
+                reelDisplay.textContent = REEL_ITEMS[itemIndex % REEL_ITEMS.length];
+                itemIndex++;
 
-                // 종료 조건
-                if (position >= targetPosition - 100 && speed < 1) {
-                    slotReel.style.transform = `translateY(${targetPosition}px)`;
+                // 총 20번 반복 후 멈춤
+                if (itemIndex > 20) {
+                    clearInterval(spinInterval);
                     
-                    // 사용된 질문 처리
+                    // 릴 숨기기
+                    reelDisplay.classList.add('hide');
+                    
+                    // 최종 질문 표시
+                    questionText.textContent = QUESTIONS[selectedIndex];
+                    questionContainer.classList.remove('show');
+                    
+                    // 페이드인
                     setTimeout(() => {
-                        availableQuestions = availableQuestions.filter(q => q !== selectedQuestion);
-                        usedQuestions.push(selectedQuestion);
-                        updateCounter();
-                        
+                        questionContainer.classList.add('show');
                         isSpinning = false;
-                        spinButton.disabled = availableQuestions.length === 0;
-                        
-                        if (availableQuestions.length === 0) {
-                            spinButton.textContent = '모든 질문 완료!';
-                        }
-                    }, 300);
-                } else {
-                    animationId = requestAnimationFrame(animate);
+                        spinButton.disabled = false;
+                        updateCounter();
+                    }, 100);
                 }
-            }
-
-            animate();
+            }, 150); // 150ms마다 변경
         }
 
         spinButton.addEventListener('click', spin);
-
-        const resetButton = document.getElementById('resetButton');
-        resetButton.addEventListener('click', () => {
-            availableQuestions = [...questions];
-            usedQuestions = [];
-            spinButton.disabled = false;
-            spinButton.textContent = '질문 뽑기';
-            createSlotItems([questions[0]]);
-            slotReel.style.transform = 'translateY(0)';
-            updateCounter();
-        });
-
-        // 초기 표시
-        createSlotItems([questions[0]]);
+        
+        // 초기화
+        questionText.textContent = QUESTIONS[0];
         updateCounter();
     </script>
 </body>
