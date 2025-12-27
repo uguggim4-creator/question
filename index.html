@@ -235,17 +235,9 @@
                         const lines = Math.round(textHeight / lineHeight);
                         const gap = 12;
 
-                        // 위치 초기화 후 줄 수에 따라 배치
-                        questionContainer.style.top = 'auto';
+                        // 위치 초기화
+                        questionContainer.style.top = '0';
                         questionContainer.style.bottom = 'auto';
-
-                        if (lines <= 1) {
-                            // 1줄: 밑줄 바로 위 (릴 디스플레이와 같은 위치)
-                            questionContainer.style.bottom = `calc(100% + ${gap}px)`;
-                        } else {
-                            // 2줄 이상: 한 줄 더 올림
-                            questionContainer.style.bottom = `calc(100% + ${gap + lineHeight}px)`;
-                        }
 
                         questionContainer.classList.add('show');
                         isSpinning = false;
