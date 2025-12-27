@@ -78,6 +78,7 @@
             left: 0;
             top: auto;
             bottom: auto;
+            pointer-events: none;
         }
 
         .question-container.show {
@@ -258,6 +259,10 @@
         }
 
         spinButton.addEventListener('click', spin);
+        spinButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            spin();
+        });
         
         // 초기화
         questionText.textContent = QUESTIONS[0];
