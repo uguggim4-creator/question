@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Slot Machine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .slot-machine {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            width: 100%;
+        }
+
+        .slot-window {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slot-reel {
+            position: absolute;
+            width: 100%;
+            transition: transform 0.1s linear;
+        }
+
+        .slot-item {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: 500;
+            color: white;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .spin-button {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 15px 50px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px 0 rgba(31, 38, 135, 0.3);
+        }
+
+        .spin-button:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(31, 38, 135, 0.4);
+        }
+
+        .spin-button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .spin-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .counter {
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="slot-machine">
+            <div class="slot-window">
+                <div class="slot-reel" id="slotReel"></div>
+            </div>
+        </div>
+        <button class="spin-button" id="spinButton">질문 뽑기</button>
+        <div class="counter" id="counter">남은 질문: 100개</div>
+    </div>
+
+    <script>
+        const questions = [
+            "가장 좋아하는 음식은 무엇인가요?",
+            "어렸을 때 꿈은 무엇이었나요?",
+            "가장 기억에 남는 여행지는?",
+            "좋아하는 영화 장르는?",
+            "취미가 있다면 무엇인가요?",
+            "가장 행복했던 순간은 언제인가요?",
+            "가장 좋아하는 계절은?",
+            "강아지와 고양이 중 어느 쪽을 더 좋아하나요?",
+            "아침형 인간인가요, 저녁형 인간인가요?",
+            "커피와 차 중 무엇을 더 좋아하나요?",
+            "좋아하는 색깔은?",
+            "가장 두려운 것은 무엇인가요?",
+            "10년 후 자신의 모습은?",
+            "무인도에 가져갈 물건 3가지는?",
+            "가장 존경하는 사람은?",
+            "좋아하는 책이 있나요?",
+            "스트레스를 어떻게 푸나요?",
+            "가장 좋아하는 노래는?",
+            "새벽 2시에 주로 무엇을 하나요?",
+            "가장 싫어하는 음식은?",
+            "복권에 당첨되면 가장 먼저 할 일은?",
+            "좋아하는 운동이 있나요?",
+            "가장 자주 사용하는 앱은?",
+            "SNS를 자주 하는 편인가요?",
+            "요리를 잘하나요?",
+            "좋아하는 날씨는?",
+            "주말에 주로 무엇을 하나요?",
+            "가장 최근에 배운 것은?",
+            "좋아하는 숫자가 있나요?",
+            "어떤 향수를 사용하나요?",
+            "가장 좋아하는 과일은?",
+            "밤에 잠이 잘 오나요?",
+            "좋아하는 음악 장르는?",
+            "패션 스타일은 어떤가요?",
+            "자신만의 특별한 능력이 있나요?",
+            "가장 최근에 운 일은?",
+            "좋아하는 브랜드가 있나요?",
+            "어떤 사람에게 끌리나요?",
+            "인생의 좌우명은?",
+            "가장 중요하게 생각하는 가치는?",
+            "친구가 많은 편인가요?",
+            "혼자 있는 시간을 즐기나요?",
+            "외향적인가요, 내향적인가요?",
+            "계획을 세우는 것을 좋아하나요?",
+            "즉흥적인 편인가요?",
+            "돈과 시간 중 무엇이 더 중요한가요?",
+            "사랑과 우정 중 무엇이 더 중요한가요?",
+            "좋아하는 꽃은?",
+            "가장 최근에 본 꿈은?",
+            "악몽을 자주 꾸나요?",
+            "좋아하는 게임이 있나요?",
+            "게임을 자주 하나요?",
+            "좋아하는 만화나 애니메이션은?",
+            "어떤 초능력을 갖고 싶나요?",
+            "과거로 돌아갈 수 있다면 언제로 가고 싶나요?",
+            "미래를 볼 수 있다면 보고 싶나요?",
+            "좋아하는 역사적 인물은?",
+            "어느 시대에 태어나고 싶었나요?",
+            "외계인이 존재한다고 생각하나요?",
+            "유령을 믿나요?",
+            "운명을 믿나요?",
+            "전생이 있다고 생각하나요?",
+            "사후세계가 있다고 생각하나요?",
+            "종교가 있나요?",
+            "명상을 해본 적이 있나요?",
+            "요가를 해본 적이 있나요?",
+            "다이어트를 해본 적이 있나요?",
+            "성형수술에 대해 어떻게 생각하나요?",
+            "문신이 있나요?",
+            "피어싱이 있나요?",
+            "알레르기가 있나요?",
+            "지병이 있나요?",
+            "안경을 쓰나요, 렌즈를 끼나요?",
+            "키가 큰 편인가요?",
+            "살이 찌는 체질인가요?",
+            "술을 자주 마시나요?",
+            "담배를 피우나요?",
+            "좋아하는 술은?",
+            "술버릇이 있나요?",
+            "해장은 어떻게 하나요?",
+            "가장 최근에 술 먹은 날은?",
+            "가장 취했던 기억은?",
+            "차를 가지고 있나요?",
+            "운전을 좋아하나요?",
+            "대중교통과 자가용 중 선호하는 것은?",
+            "좋아하는 자동차 브랜드는?",
+            "오토바이를 타본 적이 있나요?",
+            "자전거를 탈 수 있나요?",
+            "수영을 할 수 있나요?",
+            "악기를 다룰 수 있나요?",
+            "노래를 잘 부르나요?",
+            "춤을 잘 추나요?",
+            "그림을 잘 그리나요?",
+            "사진 찍는 것을 좋아하나요?",
+            "셀카를 자주 찍나요?",
+            "좋아하는 사진 필터는?",
+            "인스타그램을 자주 하나요?",
+            "유튜브를 자주 보나요?",
+            "좋아하는 유튜버가 있나요?",
+            "넷플릭스를 구독하나요?",
+            "좋아하는 드라마는?",
+            "좋아하는 배우는?",
+        ];
+
+        let availableQuestions = [...questions];
+        let usedQuestions = [];
+        let isSpinning = false;
+
+        const slotReel = document.getElementById('slotReel');
+        const spinButton = document.getElementById('spinButton');
+        const counter = document.getElementById('counter');
+
+        function updateCounter() {
+            counter.textContent = `남은 질문: ${availableQuestions.length}개`;
+        }
+
+        function createSlotItems(questionsArray) {
+            slotReel.innerHTML = '';
+            questionsArray.forEach(question => {
+                const item = document.createElement('div');
+                item.className = 'slot-item';
+                item.textContent = question;
+                slotReel.appendChild(item);
+            });
+        }
+
+        function spin() {
+            if (isSpinning || availableQuestions.length === 0) return;
+
+            isSpinning = true;
+            spinButton.disabled = true;
+
+            // 랜덤 섞기
+            const shuffled = [...availableQuestions].sort(() => Math.random() - 0.5);
+            
+            // 선택될 질문을 마지막에 배치
+            const selectedIndex = Math.floor(Math.random() * availableQuestions.length);
+            const selectedQuestion = availableQuestions[selectedIndex];
+            
+            // 스크롤 효과를 위한 배열 생성
+            const displayQuestions = [...shuffled, selectedQuestion];
+            createSlotItems(displayQuestions);
+
+            let position = 0;
+            let speed = 20;
+            const maxSpeed = 100;
+            const deceleration = 0.97;
+            let targetPosition = (displayQuestions.length - 1) * 200;
+
+            function animate() {
+                if (speed < maxSpeed) {
+                    speed += 5;
+                }
+
+                position += speed;
+
+                if (position >= targetPosition - 1000) {
+                    speed *= deceleration;
+                }
+
+                slotReel.style.transform = `translateY(-${position}px)`;
+
+                if (position < targetPosition) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // 정확한 위치에 맞추기
+                    slotReel.style.transform = `translateY(-${targetPosition}px)`;
+                    
+                    // 사용된 질문 처리
+                    setTimeout(() => {
+                        availableQuestions = availableQuestions.filter(q => q !== selectedQuestion);
+                        usedQuestions.push(selectedQuestion);
+                        updateCounter();
+                        
+                        isSpinning = false;
+                        spinButton.disabled = availableQuestions.length === 0;
+                        
+                        if (availableQuestions.length === 0) {
+                            spinButton.textContent = '모든 질문 완료!';
+                        }
+                    }, 500);
+                }
+            }
+
+            animate();
+        }
+
+        spinButton.addEventListener('click', spin);
+
+        // 초기 표시
+        createSlotItems([questions[0]]);
+        updateCounter();
+    </script>
+</body>
+</html>
