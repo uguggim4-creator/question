@@ -200,50 +200,42 @@
             isSpinning = true;
             spinButton.disabled = true;
 
-            // 랜덤 섞기
-            const shuffled = [...availableQuestions].sort(() => Math.random() - 0.5);
-            
-            // 선택될 질문을 마지막에 배치
+            // 선택될 질문을 미리 정하기
             const selectedIndex = Math.floor(Math.random() * availableQuestions.length);
             const selectedQuestion = availableQuestions[selectedIndex];
             
-            // 스크롤 효과를 위한 배열 생성
-            const displayQuestions = [...shuffled, selectedQuestion];
-            createSlotItems(displayQuestions);
+            // 회전할 질문들 준비 (20개 이상으로 많이 반복)
+            const rotationQuestions = [];
+            for (let i = 0; i < 25; i++) {
+                const idx = Math.floor(Math.random() * availableQuestions.length);
+                rotationQuestions.push(availableQuestions[idx]);
+            }
+            rotationQuestions.push(selectedQuestion);
+            
+            createSlotItems(rotationQuestions);
 
             let position = 0;
-            let speed = 5;
-            const maxSpeed = 50;
-            const acceleration = 1.15;
-            const deceleration = 0.95;
-            let targetPosition = (displayQuestions.length - 1) * 200;
-            let isAccelerating = true;
-            let isDecelerating = false;
+            let speed = 15;
+            const maxSpeed = 80;
+            const targetPosition = (rotationQuestions.length - 1) * 200;
+            let animationId = null;
 
             function animate() {
-                if (isAccelerating && speed < maxSpeed) {
-                    speed *= acceleration;
-                    if (speed >= maxSpeed) {
-                        speed = maxSpeed;
-                        isAccelerating = false;
-                    }
+                // 가속 단계
+                if (speed < maxSpeed) {
+                    speed += 3;
+                }
+                
+                // 감속 시작 지점
+                if (position > targetPosition - 3000) {
+                    speed *= 0.96;
                 }
 
                 position += speed;
-
-                if (position >= targetPosition - 2000) {
-                    if (!isDecelerating) {
-                        isDecelerating = true;
-                    }
-                    speed *= deceleration;
-                }
-
                 slotReel.style.transform = `translateY(-${position}px)`;
 
-                if (position < targetPosition && speed > 0.5) {
-                    requestAnimationFrame(animate);
-                } else {
-                    // 정확한 위치에 맞추기
+                // 종료 조건
+                if (position >= targetPosition - 100 && speed < 1) {
                     slotReel.style.transform = `translateY(-${targetPosition}px)`;
                     
                     // 사용된 질문 처리
@@ -258,7 +250,9 @@
                         if (availableQuestions.length === 0) {
                             spinButton.textContent = '모든 질문 완료!';
                         }
-                    }, 500);
+                    }, 300);
+                } else {
+                    animationId = requestAnimationFrame(animate);
                 }
             }
 
